@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "image_bucket_name" {
   description = "Name of the S3 bucket containing images"
   type        = string
-  default     = "your-image-bucket-name"
+  default     = "tianas-unique-image-storing-bucket"
 }
 
 variable "lambda_function_name" {
