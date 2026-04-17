@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+package/
+deployment-package.zip
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+*.tfvars
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

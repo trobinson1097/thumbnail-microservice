@@ -1,0 +1,62 @@
+name: Deploy Lambda Thumbnail Generator
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'thumbnail-microservice/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE_TO_ASSUME }}
+          aws-region: us-east-2
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies and create deployment package
+        run: |
+          # Install dependencies to a package directory
+          pip install -r requirements.txt -t package/
+          
+          # Copy Lambda function code to package
+          cp src/lambda_function.py package/
+          
+          # Create deployment zip
+          cd package
+          zip -r ../deployment-package.zip .
+          cd ..
+      
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+      
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+      
+      - name: Terraform Plan
+        working-directory: terraform
+        run: terraform plan
+      
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -auto-approve
