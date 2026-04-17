@@ -3,7 +3,7 @@
 
 terraform {
   backend "s3" {
-    bucket         = "your-state-bucket-name"  # update this 
+    bucket         = "rock-of-ages-terraform-state-tmr"  # update this 
     key            = "lambda/terraform.tfstate"
     region         = "us-east-2"
     dynamodb_table = "rock-of-ages-terraform-locks" 
