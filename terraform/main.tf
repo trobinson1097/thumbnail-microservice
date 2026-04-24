@@ -62,6 +62,11 @@ resource "aws_iam_role_policy" "lambda_s3_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["sqs:SendMessage"]
+        Resource = aws_sqs_queue.thumbnail_complete.arn
       }
     ]
   })
@@ -93,6 +98,7 @@ resource "aws_lambda_function" "thumbnail_generator" {
   environment {
     variables = {
       THUMBNAIL_SIZES = "small,medium,large"
+      SQS_QUEUE_URL   = aws_sqs_queue.thumbnail_complete.url
     }
   }
 
@@ -122,4 +128,9 @@ resource "aws_lambda_permission" "allow_s3" {
   function_name = aws_lambda_function.thumbnail_generator.function_name
   principal     = "s3.amazonaws.com"
   source_arn    = data.aws_s3_bucket.images.arn
+}
+
+resource "aws_sqs_queue" "thumbnail_complete" {
+  name                      = "thumbnail-complete"
+  message_retention_seconds = 86400  # 1 day
 }
